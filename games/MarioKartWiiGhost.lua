@@ -1,4 +1,4 @@
--- Super Mario Galaxy
+-- Mario Kart Wii Ghost
 
 
 
@@ -42,6 +42,10 @@ SMG1.supportedGameVersions = {
   jp = 'RMGJ01',
   ja = 'RMGJ01',
 
+  kr = 'RMCK01',
+  ko = 'RMCK01',
+
+
   -- Wii must be set to English language.
   eu = 'RMCP01',
   pal = 'RMCP01',
@@ -80,13 +84,16 @@ function SMG1:initConstantAddresses()
 
   if self.gameId == 'RMCE01' then
     self.addrs.refPointer = self.addrs.o + 0x9BD110
-    self.addrs.shakeRelatedBlock = self.addrs.o + 0x9E9C7C
+    self.addrs.ckptPointer = self.addrs.o + 0x9B8F70
   elseif self.gameId == 'RMCJ01' then
-    self.addrs.refPointer = self.addrs.o + 0xF8F328
-    self.addrs.shakeRelatedBlock = self.addrs.o + 0x9E9BDC
+    self.addrs.refPointer = self.addrs.o + 0x9C0958
+    self.addrs.ckptPointer = self.addrs.o + 0x9BC790
   elseif self.gameId == 'RMCP01' then
     self.addrs.refPointer = self.addrs.o + 0x9C18F8
-    self.addrs.shakeRelatedBlock = self.addrs.o + 0x9E9C7C
+    self.addrs.ckptPointer = self.addrs.o + 0x9BD730
+  elseif self.gameId == 'RMCK01' then
+    self.addrs.refPointer = self.addrs.o + 0x9AFF38
+    self.addrs.ckptPointer = self.addrs.o + 0x9ABD70
   end
 end
 
@@ -106,6 +113,20 @@ function SMG1:updateRefPointer()
   self.pointerValues.ref = readIntBE(self.addrs.refPointer, 4)
 end
 
+
+
+function SMG1:updateckptPointer()
+  -- Not sure what this is meant to point to exactly, but when this pointer
+  -- changes value, some other relevant addresses (like pos and vel)
+  -- move by the same amount as the value change.
+  --
+  -- This pointer value changes whenever you load a different area.
+  -- It's invalid during transition screens and before the
+  -- title screen.
+  self.pointerValues.ckptref = readIntBE(self.addrs.ckptPointer, 4)
+end
+
+
 function SMG1:updateMessageInfoPointer()
   -- Pointer that can be used to locate various message/text related info.
   --
@@ -118,13 +139,14 @@ function SMG1:updatePosBlock()
     self.addrs.posBlock = nil
   else
     self.addrs.posBlock = (
-      self.addrs.o + self.pointerValues.ref - 0x80000000 + 0x19A0)
+      self.addrs.o + self.pointerValues.ref - 0x80000000 + 0x199C)
   end
 end
 
 function SMG1:updateAddresses()
   self:updateRefPointer()
   self:updateMessageInfoPointer()
+  self:updateckptPointer()
   self:updatePosBlock()
 end
 
@@ -150,13 +172,19 @@ function SMG1.RefValue:isValid()
   return self.game.pointerValues.ref ~= 0
 end
 
+-- Values that are a constant offset from the ckptPointer.
+SMG1.ckptValue = subclass(MemoryValue)
 
--- Values that are part of the shake-related block.
-SMG1.ShakeRelatedBlockValue = subclass(MemoryValue)
-
-function SMG1.ShakeRelatedBlockValue:getAddress()
-  return self.game.addrs.shakeRelatedBlock + self.offset
+function SMG1.ckptValue:getAddress()
+  return (
+    self.game.addrs.o + self.game.pointerValues.ckptref - 0x80000000 + self.offset)
 end
+
+function SMG1.ckptValue:isValid()
+  return self.game.pointerValues.ckptref ~= 0
+end
+
+
 
 
 -- Values that are a constant small offset from the position values' location.
@@ -185,184 +213,146 @@ function SMG1.MessageInfoValue:isValid()
 end
 
 
+package.loaded.layouts = nil
+local layouts = require "layouts"
+local CompoundElement = layouts.CompoundElement
 
--- General-interest state values.
+-- Display a memory value using per-character images (effectively a bitmap font).
+SMG1.ImageValueDisplay = subclass(CompoundElement)
 
-GV.generalState1a = MV(
-  "State bits 01-08", -0x128, SMG1.PosBlockValue, BinaryType,
-  {binarySize=8, binaryStartBit=7}
-)
-GV.generalState1b = MV(
-  "State bits 09-16", -0x127, SMG1.PosBlockValue, BinaryType,
-  {binarySize=8, binaryStartBit=7}
-)
-GV.generalState1c = MV(
-  "State bits 17-24", -0x126, SMG1.PosBlockValue, BinaryType,
-  {binarySize=8, binaryStartBit=7}
-)
-GV.generalState1d = MV(
-  "State bits 25-32", -0x125, SMG1.PosBlockValue, BinaryType,
-  {binarySize=8, binaryStartBit=7}
-)
-function SMG1:onGround()
-  return (self.generalState1a:get()[2] == 1)
+function SMG1.ImageValueDisplay:init(window, memoryValue, numCharacters, passedDisplayOptions)
+  -- This can be any kind of MemoryValue. The only constraint is that all the possible
+  -- characters that can be displayed are covered in the charImages defined below.
+  self.memoryValue = memoryValue
+  -- Max number of characters to show in this display. This is how many Image objects
+  -- we'll maintain.
+  self.numCharacters = numCharacters
+  -- display options to pass into the memory value's display() method.
+  self.displayOptions = {nolabel=true}
+  if passedDisplayOptions then
+    utils.updateTable(self.displayOptions, passedDisplayOptions)
+  end
+
+FontDirectory = RWCEMainDirectory .. '/Fonts'
+  self.charImageFiles = {
+    ['0'] = FontDirectory .. '/0.png',
+    ['1'] = FontDirectory .. '/1.png',
+    ['2'] = FontDirectory .. '/2.png',
+    ['3'] = FontDirectory .. '/3.png',
+    ['4'] = FontDirectory .. '/4.png',
+    ['5'] = FontDirectory .. '/5.png',
+    ['6'] = FontDirectory .. '/6.png',
+    ['7'] = FontDirectory .. '/7.png',
+    ['8'] = FontDirectory .. '/8.png',
+    ['9'] = FontDirectory .. '/9.png',
+  
+   
+    ['-'] = FontDirectory .. '/minus.png',
+    ['.'] = FontDirectory .. '/coron.png',
+  }
+
+  self.charImages = {}
+  for char, charImageFilepath in pairs(self.charImageFiles) do
+    self.charImages[char] = createPicture()
+    self.charImages[char]:loadFromFile(charImageFilepath)
+  end
+  -- Empty picture to represent a space
+  self.charImages[''] = createPicture()
+
+  local width = 48
+  local height = 64
+  for n=1, numCharacters do
+    local uiObj = createImage(window)
+    uiObj:setSize(width, height)
+    -- Allow the image to stretch to fit the size
+    uiObj:setStretch(false)
+    local relativePosition = {width*(n-1), 0}
+    self:addElement(relativePosition, uiObj)
+ end  
+end
+
+function SMG1.ImageValueDisplay:update()
+  local valueString = self.memoryValue:display(self.displayOptions)
+
+  for n, element in pairs(self.elements) do
+    if valueString:len() >= n then
+      local char = valueString:sub(n, n)
+      if self.charImages[char] == nil then
+        error(
+          "No image specified for '" .. char
+          .. "' (full string: " .. valueString .. ")")
+      end
+      element.uiObj.setPicture(self.charImages[char])
+    else
+      element.uiObj.setPicture(self.charImages[''])
+    end
+  end
 end
 
 
 
--- Unlike SMG2, SMG1 does not exactly have an in-game timer. However, this
--- address seems to be the next best thing.
--- It counts up by 1 per frame starting from the level-beginning cutscenes.
--- It also pauses for a few frames when you get the star.
--- It resets to 0 if you die.
+
+
+
+
 GV.stageTimeFrames =
-  MV("Stage time, frames", 0x9C38C0, SMG1.StaticValue, IntType)
+  MV("Race Time, frames", 0x9C38C0, SMG1.StaticValue, IntType)
 
 
 
 -- Position, velocity, and other coordinates related stuff.
 GV.pos = V(
   Vector3Value,
-  MV("Pos X", 0x0, SMG1.PosBlockValue, FloatType),
-  MV("Pos Y", 0x4, SMG1.PosBlockValue, FloatType),
-  MV("Pos Z", 0x8, SMG1.PosBlockValue, FloatType)
+  MV("Pos X", 0x4, SMG1.PosBlockValue, FloatType),
+  MV("Pos Y", 0x8, SMG1.PosBlockValue, FloatType),
+  MV("Pos Z", 0xC, SMG1.PosBlockValue, FloatType)
 )
 GV.pos.label = "Position"
 GV.pos.displayDefaults = {signed=true, beforeDecimal=5, afterDecimal=1}
+
+-- Position, velocity, and other coordinates related stuff.
+GV.posGhost = V(
+  Vector3Value,
+  MV("Pos X", 0x4, SMG1.PosBlockValue, FloatType),
+  MV("Pos Y", 0x8, SMG1.PosBlockValue, FloatType),
+  MV("Pos Z", 0xC, SMG1.PosBlockValue, FloatType)
+)
+GV.pos.label = "Position"
+GV.pos.displayDefaults = {signed=true, beforeDecimal=5, afterDecimal=1}
+
 
 GV.pos_early1 = V(
   Vector3Value,
   MV("Pos X", 0x1840, SMG1.RefValue, FloatType),
   MV("Pos Y", 0x1844, SMG1.RefValue, FloatType),
-  MV("Pos Z", 0x184C, SMG1.RefValue, FloatType)
+  MV("Pos Z", 0x1848, SMG1.RefValue, FloatType)
 )
 GV.pos_early1.label = "Position"
 GV.pos_early1.displayDefaults =
   {signed=true, beforeDecimal=5, afterDecimal=1}
 
 
--- Velocity directly from a memory value.
--- Not all kinds of movement are covered. For example, launch stars and
--- riding moving platforms aren't accounted for.
---
--- It's usually preferable to use velocity based on position change, because
--- that's more accurate to observable velocity. But this velocity value
--- can still have its uses. For example, this is actually the velocity
--- observed on the NEXT frame, so if we want advance knowledge of the velocity,
--- then we might use this.
-GV.baseVel = V(
-  Vector3Value,
-  MV("Base Vel X", 0x78, SMG1.PosBlockValue, FloatType),
-  MV("Base Vel Y", 0x7C, SMG1.PosBlockValue, FloatType),
-  MV("Base Vel Z", 0x80, SMG1.PosBlockValue, FloatType)
-)
-GV.baseVel.label = "Base Vel"
-GV.baseVel.displayDefaults = {signed=true}
 
-
--- Mario/Luigi's direction of gravity.
-GV.upVectorGravity = V(
-  Vector3Value,
-  MV("Up X", 0x6A3C, SMG1.RefValue, FloatType),
-  MV("Up Y", 0x6A40, SMG1.RefValue, FloatType),
-  MV("Up Z", 0x6A44, SMG1.RefValue, FloatType)
-)
-GV.upVectorGravity.label = "Grav (Up)"
-GV.upVectorGravity.displayDefaults =
-  {signed=true, beforeDecimal=1, afterDecimal=4}
-
-GV.downVectorGravity = V(
-  Vector3Value,
-  MV("Down X", 0x1B10, SMG1.RefValue, FloatType),
-  MV("Down Y", 0x1B14, SMG1.RefValue, FloatType),
-  MV("Down Z", 0x1B18, SMG1.RefValue, FloatType)
-)
-GV.downVectorGravity.label = "Grav (Down)"
-GV.downVectorGravity.displayDefaults =
-  {signed=true, beforeDecimal=1, afterDecimal=4}
-
--- Up vector (tilt). Offset from the gravity up vector when there is tilt.
-GV.upVectorTilt = V(
-  Vector3Value,
-  MV("Up X", 0xC0, SMG1.PosBlockValue, FloatType),
-  MV("Up Y", 0xC4, SMG1.PosBlockValue, FloatType),
-  MV("Up Z", 0xC8, SMG1.PosBlockValue, FloatType)
-)
-GV.upVectorTilt.label = "Tilt (Up)"
-GV.upVectorTilt.displayDefaults =
-  {signed=true, beforeDecimal=1, afterDecimal=4}
-
-
-
--- Inputs and spin state.
-
-GV.buttons1 = MV("Buttons 1", 0x61D342, SMG1.StaticValue, BinaryType,
-  {binarySize=8, binaryStartBit=7})
-GV.buttons2 = MV("Buttons 2", 0x61D343, SMG1.StaticValue, BinaryType,
-  {binarySize=8, binaryStartBit=7})
-
-GV.wiimoteShakeBit =
-  MV("Wiimote shake bit", 0xC, SMG1.ShakeRelatedBlockValue, ByteType)
-GV.nunchukShakeBit =
-  MV("Nunchuk shake bit", 0x27F1, SMG1.RefValue, ByteType)
-GV.spinCooldownTimer =
-  MV("Spin cooldown timer", 0x2217, SMG1.RefValue, ByteType)
-GV.spinAttackTimer =
-  MV("Spin attack timer", 0x2214, SMG1.RefValue, ByteType)
--- When this timer is inactive, its value is 180
-GV.midairSpinTimer =
-  MV("Midair spin timer", 0x41BF, SMG1.RefValue, ByteType)
-GV.midairSpinType =
-  MV("Midair spin state", 0x41E7, SMG1.RefValue, ByteType)
-
-GV.stickX = MV("Stick X", 0x61D3A0, SMG1.StaticValue, FloatType)
-GV.stickY = MV("Stick Y", 0x61D3A4, SMG1.StaticValue, FloatType)
 
 GV.airtime=
   MV("Airtime", 0x608, SMG1.RefValue, IntType)
+GV.vehiclespeed =
+  MV("Speed", 0x411, SMG1.RefValue, FloatType)
 GV.mtcharge =
-  MV("MT Charge", 0x4EE, SMG1.RefValue, ByteType)
+  MV("MT Charge", 0x4EE, SMG1.RefValue, ShortType)
 GV.checkpoint =
-  MV("CheckPoint ID", -0x8D49, SMG1.RefValue, ByteType)
+  MV("CheckPoint ID", 0xFB, SMG1.ckptValue, ByteType)
 GV.keycheckpoint =
-  MV("Key CheckPoint ID", -0x8D2D, SMG1.RefValue, ByteType)
--- When this timer is inactive, its value is 180
+  MV("Key CheckPoint ID", 0x117, SMG1.ckptValue, ByteType)
 GV.lapcompleted =
-  MV("Lap Completion", -0x8D48, SMG1.RefValue, FloatType)
+  MV("Lap Completion", 0xFC, SMG1.ckptValue, FloatType)
 GV.mtboost =
-  MV("MT Boost Timer", 0x4F3, SMG1.RefValue, ByteType)
+  MV("MT Boost", 0x4F3, SMG1.RefValue, ByteType)
 GV.mushroomboost =
-  MV("Mushroom Boost Timer", 0x501, SMG1.RefValue, ByteType)
-GV.trickboost =
-  MV("Trick Boost Timer", 0x505, SMG1.RefValue, ByteType)
-
-
-
-
--- Some other stuff.
-
--- Underwater breathing
-GV.air = MV("Air", 0x6AB8, SMG1.RefValue, IntType)
--- Jump, double jump or rainbow star jump, triple jump,
--- bonk or forward facing slope jump, sideflip, long jump, backflip, wall jump,
--- midair spin, ?, ledge hop, spring topman bounce, enemy bounce,
--- jump off swing / pull star release / after planet landing / spin out of water
-GV.lastJumpType =
-  MV("Last jump type", 0x41EF, SMG1.RefValue, ByteType)
--- Not quite sure what this is
-GV.groundTurnTimer =
-  MV("Ground turn timer", 0x41CB, SMG1.RefValue, ByteType)
-
-
-
--- Text.
-
-GV.textProgress =
-  MV("Text progress", 0x2D39C, SMG1.MessageInfoValue, IntType)
-GV.alphaReq =
-  MV("Alpha req", 0x2D3B0, SMG1.MessageInfoValue, FloatType)
-GV.fadeRate =
-  MV("Fade rate", 0x2D3B4, SMG1.MessageInfoValue, FloatType)
+  MV("Mushroom Boost", 0x501, SMG1.RefValue, ByteType)
+GV.trickboost  =
+  MV("TrickBoost", 0x505, SMG1.RefValue, ByteType)
 
 
 return SMG1
+
