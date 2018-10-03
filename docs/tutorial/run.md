@@ -103,7 +103,12 @@
     Mario Kart Wii SOM | North America | `'MarioKartWii'` | `'na'` | `'ctgprecording'`
     Mario Kart Wii SOM | Europe | `'MarioKartWii'` | `'eu'` | `'ctgprecording'`
     Mario Kart Wii SOM | Japan | `'MarioKartWii'` | `'jp'` | `'ctgprecording'`
-    Mario Kart Wii SOM | Korea | `'MarioKartWii'` | `'kr'` | `'ctgprecording'`    
+    Mario Kart Wii SOM | Korea | `'MarioKartWii'` | `'kr'` | `'ctgprecording'`  
+    
+    Add "Ghost" to "MarioKartWii" if you want to use a SOM when racing against a ghost.
+    If You want the XZ SOM then Change "ctgprecording" to "recording"
+    
+    NOTE: This SOM does not work online, it's used for Time Trial/ TAS purpose.
 
 1. Click the Execute Script button at the bottom of the Lua script window. If all went well, a new window should appear, displaying RAM values from the game.
 
