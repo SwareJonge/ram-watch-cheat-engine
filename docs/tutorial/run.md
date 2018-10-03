@@ -92,6 +92,18 @@
     Super Mario Galaxy | Europe | `'supermariogalaxy'` | `'eu'` | `'positionAndInputs'`
     Super Mario Galaxy | Japan | `'supermariogalaxy'` | `'jp'` | `'positionAndInputs'`
     Super Mario Galaxy 2 | North America | `'supermariogalaxy2'` | `'na'` | `'positionAndInputs'`
+    Mario Kart Wii | North America | `'MarioKartWii'` | `'na'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii | Europe | `'MarioKartWii'` | `'eu'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii | Japan | `'MarioKartWii'` | `'jp'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii | Korea | `'MarioKartWii'` | `'kr'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii Ghost | North America | `'MarioKartWii'` | `'na'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii Ghost | Europe | `'MarioKartWiiGhost'` | `'eu'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii Ghost | Japan | `'MarioKartWiiGhost'` | `'jp'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii Ghost | Korea | `'MarioKartWiiGhost'` | `'kr'` | `'velocityAndRaceInfo'`
+    Mario Kart Wii SOM | North America | `'MarioKartWii'` | `'na'` | `'ctgprecording'`
+    Mario Kart Wii SOM | Europe | `'MarioKartWii'` | `'eu'` | `'ctgprecording'`
+    Mario Kart Wii SOM | Japan | `'MarioKartWii'` | `'jp'` | `'ctgprecording'`
+    Mario Kart Wii SOM | Korea | `'MarioKartWii'` | `'kr'` | `'ctgprecording'`    
 
 1. Click the Execute Script button at the bottom of the Lua script window. If all went well, a new window should appear, displaying RAM values from the game.
 
