@@ -337,7 +337,7 @@ GV.pos_early1.displayDefaults =
 GV.airtime=
   MV("Airtime", 0x608, SMG1.RefValue, IntType)
 GV.vehiclespeed =
-  MV("Speed", 0x411, SMG1.RefValue, FloatType)
+  MV("Speed", 0x410, SMG1.RefValue, FloatType)
 GV.mtcharge =
   MV("MT Charge", 0x4EE, SMG1.RefValue, ShortType)
 GV.checkpoint =
