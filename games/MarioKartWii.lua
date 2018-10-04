@@ -39,8 +39,8 @@ SMG1.supportedGameVersions = {
   na = 'RMCE01',
   us = 'RMCE01',
 
-  jp = 'RMGJ01',
-  ja = 'RMGJ01',
+  jp = 'RMCJ01',
+  ja = 'RMCJ01',
 
   kr = 'RMCK01',
   ko = 'RMCK01',
