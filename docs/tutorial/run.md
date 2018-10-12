@@ -100,15 +100,18 @@
     Mario Kart Wii Ghost | Europe | `'MarioKartWiiGhost'` | `'eu'` | `'velocityAndRaceInfo'`
     Mario Kart Wii Ghost | Japan | `'MarioKartWiiGhost'` | `'jp'` | `'velocityAndRaceInfo'`
     Mario Kart Wii Ghost | Korea | `'MarioKartWiiGhost'` | `'kr'` | `'velocityAndRaceInfo'`
-    Mario Kart Wii SOM | North America | `'MarioKartWii'` | `'na'` | `'ctgprecording'`
-    Mario Kart Wii SOM | Europe | `'MarioKartWii'` | `'eu'` | `'ctgprecording'`
-    Mario Kart Wii SOM | Japan | `'MarioKartWii'` | `'jp'` | `'ctgprecording'`
-    Mario Kart Wii SOM | Korea | `'MarioKartWii'` | `'kr'` | `'ctgprecording'`  
+    Mario Kart Wii SOM | North America | `'MarioKartWii'` | `'na'` | `'ManderMode'`
+    Mario Kart Wii SOM | Europe | `'MarioKartWii'` | `'eu'` | `'ManderMode'`
+    Mario Kart Wii SOM | Japan | `'MarioKartWii'` | `'jp'` | `'ManderMode'`
+    Mario Kart Wii SOM | Korea | `'MarioKartWii'` | `'kr'` | `'ManderMode'`  
     
     Add "Ghost" to "MarioKartWii" if you want to use a SOM when racing against a ghost.
     If You want the XZ SOM then Change "ctgprecording" to "recording"
+    There are many more layout names for MKW, you can see them in MarioKartWii_layouts.lua
+    You have to install this font for The Mander SOM: https://cdn.discordapp.com/attachments/436206584847269899/499923905448771585/Px437_TandyNew_TV-2y.ttf
     
     NOTE: This SOM does not work online, it's used for Time Trial/ TAS purpose.
+    TODO: Make a Cheat code to make The miniturbo charge address static
 
 1. Click the Execute Script button at the bottom of the Lua script window. If all went well, a new window should appear, displaying RAM values from the game.
 
