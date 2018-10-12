@@ -113,7 +113,7 @@
     
     NOTE: This SOM does not work online, it's used for Time Trial/ TAS purpose.
     
-    TODO: Make a Cheat code to make The miniturbo charge address static.
+    TODO: Make a Cheat codes to make some addresses static.
 
 1. Click the Execute Script button at the bottom of the Lua script window. If all went well, a new window should appear, displaying RAM values from the game.
 
