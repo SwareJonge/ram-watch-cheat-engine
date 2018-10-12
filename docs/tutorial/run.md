@@ -112,7 +112,8 @@
     You have to install this font for The Mander SOM: https://cdn.discordapp.com/attachments/436206584847269899/499923905448771585/Px437_TandyNew_TV-2y.ttf
     
     NOTE: This SOM does not work online, it's used for Time Trial/ TAS purpose.
-    TODO: Make a Cheat code to make The miniturbo charge address static
+    
+    TODO: Make a Cheat code to make The miniturbo charge address static.
 
 1. Click the Execute Script button at the bottom of the Lua script window. If all went well, a new window should appear, displaying RAM values from the game.
 
