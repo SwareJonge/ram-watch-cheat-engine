@@ -118,7 +118,7 @@ Value = {}
 valuetypes.Value = Value
 Value.label = "Label not specified"
 Value.initialValue = nil
-Value.invalidDisplay = "<Invalid value>"
+Value.invalidDisplay = "0"
 
 function Value:init()
   self.value = self.initialValue
@@ -208,9 +208,9 @@ function Value:display(passedOptions)
   else
     local label = options.label or self:getLabel()
     if options.narrow then
-      return label..":\n "..valueDisplay
+      return label.."\n "..valueDisplay
     else
-      return label..": "..valueDisplay
+      return label.." "..valueDisplay
     end
   end
 end
