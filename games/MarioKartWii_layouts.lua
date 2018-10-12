@@ -4,8 +4,6 @@ local subclass = utils.subclass
 
 package.loaded.valuetypes = nil
 local valuetypes = require 'valuetypes'
-package.loaded.d3d = nil
-local transparent = require 'd3d'
 package.loaded.layouts = nil
 local layoutsModule = require 'layouts'
 local Layout = layoutsModule.Layout
