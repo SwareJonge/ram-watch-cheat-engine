@@ -85,9 +85,11 @@ function SMG1:initConstantAddresses()
   if self.gameId == 'RMCE01' then
     self.addrs.refPointer = self.addrs.o + 0x9BD110
     self.addrs.ckptPointer = self.addrs.o + 0x9B8F70
+    self.addrs.MEMPointer = self.addrs.o + 0x429F14    
   elseif self.gameId == 'RMCJ01' then
     self.addrs.refPointer = self.addrs.o + 0x9C0958
     self.addrs.ckptPointer = self.addrs.o + 0x9BC790
+    self.addrs.MEMPointer = self.addrs.o + 0x42DC14
   elseif self.gameId == 'RMCP01' then
     self.addrs.refPointer = self.addrs.o + 0x9C18F8
     self.addrs.ckptPointer = self.addrs.o + 0x9BD730
@@ -95,6 +97,7 @@ function SMG1:initConstantAddresses()
   elseif self.gameId == 'RMCK01' then
     self.addrs.refPointer = self.addrs.o + 0x9AFF38
     self.addrs.ckptPointer = self.addrs.o + 0x9ABD70
+    self.addrs.MEMPointer = self.addrs.o + 0x41C2B4
   end
 end
 
