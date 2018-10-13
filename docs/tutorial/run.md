@@ -109,7 +109,7 @@
     If You want the XZ SOM then Change "ctgprecording" to "recording"
     There are many more layout names for MKW, you can see them in MarioKartWii_layouts.lua.
     
-    You have to install this font for The Mander SOM: https://cdn.discordapp.com/attachments/436206584847269899/499923905448771585/Px437_TandyNew_TV-2y.ttf
+    You have to install this font for The Mander SOM: https://cdn.discordapp.com/attachments/454306937232949259/500419358942560257/Px437_TandyNew_TV.ttf
     
     NOTE: This SOM does not work online, it's used for Time Trial/ TAS purpose.
     
