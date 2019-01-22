@@ -104,11 +104,13 @@ function layouts.ctgprecording:init(noShake)
 self.window:setSize(400, 500)
   self.labelDefaults = {fontSize=fontSize, fontName=fixedWidthFontName}
   self.itemDisplayDefaults = {narrow=true}
+  self.window:setCaption("MKW Speedometer")
 
 
  self:addLabel()
-self:addImage(ImageValueDisplay, {game:V(game.Velocity, "XZ"), 10, {beforeDecimal=3, afterDecimal=3, leftPaddingMethod='zero'}}, {x=40, y=400})
-self:addImage(ImageValueDisplay, {game.mtcharge, 10, {trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'}}, {x=-10, y=140})
+self:addImage(ImageValueDisplay, {game.vehiclespeed, 10, {beforeDecimal=2, afterDecimal=0, leftPaddingMethod='space'}}, {x=40, y=360})
+self:addImage(ImageValueDisplay, {game.airtime, 10, {beforeDecimal=4, afterDecimal=0, leftPaddingMethod='space'}}, {x=-10, y=120})
+self:addImage(ImageValueDisplay, {game.mtcharge, 10, {trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'}}, {x=-10, y=180})
 end
 
 layouts.Inputs = subclass(Layout)
