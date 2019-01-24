@@ -80,15 +80,15 @@ function MKW:initConstantAddresses()
 
   self.addrs.zeros = self.addrs.o + 0x1700000
   if self.gameId == 'RMCE01' then
-    self.playerBase =  0x9BD110
+    self.playerBase = 0x9BD110
     self.ckptPointerOffset = 0x9B8F70
     self.MEMOffset = 0x429F14
   elseif self.gameId == 'RMCJ01' then
-    self.playerBase  =  0x9C0958
+    self.playerBase  = 0x9C0958
     self.ckptPointerOffset = 0x9BC790
     self.MEMOffset = 0x42DC14
   elseif self.gameId == 'RMCP01' then
-    self.playerBase  = 0x9C18F8
+    self.playerBase = 0x9C18F8
     self.ckptPointerOffset = 0x9BD730
     self.MEMOffset = 0x42E324
   elseif self.gameId == 'RMCK01' then
@@ -97,6 +97,7 @@ function MKW:initConstantAddresses()
     self.MEMOffset = 0x41C2B4
   end
 end
+
 
 --RaceData(speed etc.)
 function MKW:updateplayerBase()
@@ -240,16 +241,21 @@ end
 
 -- Values that are a constant small offset from the position values' location.
 
+  GV.stageTimeFrames =
+    MV("Race Time, frames", 0x9BF0B8, MKW.StaticValue, IntType)
 
- GV.stageTimeFrames =
-  MV("Race Time, frames", 0x9BF0B8, MKW.StaticValue, IntType)
-
+  GV.BoostType=
+    MV("Type of Boost:", 0x119, MKW.playerBaseValue5, ByteType)
   GV.mtboost=
-    MV("MT Boost:", 0x103, MKW.playerBaseValue5, ByteType)
+    MV("MT Boost:", 0x10D, MKW.playerBaseValue5, ByteType)
   GV.mushroomboost=
-    MV("Mushroom Boost:", 0x149, MKW.playerBaseValue5, ByteType)
+    MV("Mushroom Boost:", 0x148, MKW.playerBaseValue5, ShortType)
   GV.trickboost=
     MV("Trick Boost:", 0x115, MKW.playerBaseValue5, ByteType)
+  GV.Boost=
+    MV("Type of Boost:", 0x119, MKW.playerBaseValue5, ByteType)
+  GV.mttype=
+    MV("MT Boost:", 0x10D, MKW.playerBaseValue5, ByteType)
 
 
 -- Position, velocity, and other coordinates related stuff.
@@ -262,9 +268,6 @@ GV.pos = V(
 GV.pos.label = "Position"
 GV.pos.displayDefaults =
  {signed=true, beforeDecimal=5, afterDecimal=1}
-
--- Position, velocity, and other coordinates related stuff.
-
 
 GV.pos_early1 = V(
   Vector3Value,
@@ -283,8 +286,14 @@ GV.airtime=
   MV("Airtime:", 0x21A, MKW.playerBaseValue5, ShortType)
 GV.vehiclespeed =
   MV("Vehicle speed:", 0x20, MKW.playerBaseValue5, FloatType)
-GV.mtcharge=
+
+GV.mtcharge =
   MV("MT Charge:", 0xFE, MKW.playerBaseValue5, ShortType)
+GV.kartmtcharge =
+  MV("MT Charge:", 0x100, MKW.playerBaseValue5, ShortType)
+GV.ssmtcharge =
+  MV("SSMT Charge:", 0x14D, MKW.playerBaseValue5, ByteType)
+
 GV.checkpoint=
   MV("CheckPoint ID:", 0xA, MKW.ckptlvl1Value, ShortType)
 GV.keycheckpoint=
@@ -300,7 +309,7 @@ GV.horizontal=
 GV.vertical=
   MV("Vertical:", 0x2860, MKW.MEMValue, FloatType)
 GV.DPAD=
-  MV("DPAD:", 0x284F, MKW.MEMValue, ByteType)
+  MV("", 0x284F, MKW.MEMValue, ByteType)
 
   GV.horizontalbyte=
     MV("Horizontal:", 0x284C, MKW.MEMValue, ByteType)
@@ -315,6 +324,7 @@ GV.DPAD=
       MV("", 0xFE, MKW.playerBaseValue5, ShortType)
     GV.DPADmandermode=
       MV("", 0x284F, MKW.MEMValue, ByteType)
+
         --this address is used for the background image
         GV.kmh=
         MV("", 0x9BD110, MKW.StaticValue, ByteType)
@@ -323,8 +333,60 @@ GV.DPAD=
       return utils.floatToStr(self:get(), {trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'})
     end
 
-    function GV.mtcharge:displayValue(options)
+    function GV.airtime:displayValue(options)
       return utils.floatToStr(self:get(), {trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'})
+    end
+
+    function GV.mtcharge:display(options)
+      return "MT Charge:" .. utils.floatToStr(math.max(self.game.mtcharge:get() + self.game.kartmtcharge:get(),self.game.ssmtcharge:get()),{trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'})
+    end
+
+    function GV.mttype:display(options)
+      return utils.floatToStr(math.max(self.game.mtcharge:get() + self.game.kartmtcharge:get(),self.game.ssmtcharge:get()),{trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'})
+    end
+
+    function GV.BoostType:display(options)
+      return "Boost:" .. utils.floatToStr(math.max(self.game.trickboost:get(),self.game.mtboost:get(), self.game.mushroomboost:get()),{trimTrailingZeros=true, beforeDecimal=3, leftPaddingMethod='space'})
+    end
+
+    function GV.Boost:display(options)
+      return utils.floatToStr(math.max(self.game.trickboost:get(),self.game.mtboost:get(), self.game.mushroomboost:get()),{trimTrailingZeros=true, beforeDecimal=3, leftPaddingMethod='space'})
+    end
+
+    function GV.verticalbyte:display(options)
+      if self.game.verticalbyte:get() >= 0 and self.game.verticalbyte:get() < 7 then return "D" .. (7-self.game.verticalbyte:get())
+      elseif self.game.verticalbyte:get() == 7 then return " 0"
+      end
+      if self.game.verticalbyte:get() > 7 and self.game.verticalbyte:get() <= 14 then return "U" .. (self.game.verticalbyte:get()-7)
+      else return " "
+      end
+    end
+
+
+    function GV.horizontalbyte:display(options)
+      if self.game.horizontalbyte:get() >= 0 and self.game.horizontalbyte:get() < 7 then return "L" .. (7-self.game.horizontalbyte:get())
+      elseif self.game.horizontalbyte:get() == 7 then return " 0"
+      end
+      if self.game.horizontalbyte:get() > 7 and self.game.verticalbyte:get() <= 14 then return "R" .. (self.game.horizontalbyte:get()-7)
+      else return " "
+      end
+    end
+
+    function GV.ABLRInput:display(options)
+      if self.game.ABLRInput:get() == 0 then return "   "
+      elseif self.game.ABLRInput:get() == 1 then return "A  "
+      elseif self.game.ABLRInput:get() == 2 then return " B "
+      elseif self.game.ABLRInput:get() == 3 then return "AB "
+      elseif self.game.ABLRInput:get() == 4 then return "  L"
+      elseif self.game.ABLRInput:get() == 5 then return "A L"
+      elseif self.game.ABLRInput:get() == 6 then return " BL"
+      elseif self.game.ABLRInput:get() == 7 then return "ABL"
+      elseif self.game.ABLRInput:get() == 8 then return " B "
+      elseif self.game.ABLRInput:get() == 10 then return " B "
+      elseif self.game.ABLRInput:get() == 11 then return "AB "
+      elseif self.game.ABLRInput:get() == 14 then returb " BL"
+      else return "ABL"
+      end
     end
 
 
