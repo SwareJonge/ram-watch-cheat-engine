@@ -13,10 +13,7 @@ local MKWImageValueDisplay = require "imagevaluedisplay"
 local ImageValueDisplay = MKWImageValueDisplay.ImageValueDisplay
 local ImageNumberDisplay = MKWImageValueDisplay.ImageNumberDisplay
 local ImageNumberDisplayvertical = MKWImageValueDisplay.ImageNumberDisplayvertical
-local ImageNumberDisplayhorizontalManderMode = MKWImageValueDisplay.ImageNumberDisplayhorizontalManderMode
-local ImageNumberDisplayverticalManderMode = MKWImageValueDisplay.ImageNumberDisplayverticalManderMode
 local ImageNumberDisplayDPAD = MKWImageValueDisplay.ImageNumberDisplayDPAD
-local ImageNumberDisplayABLRManderMode = MKWImageValueDisplay.ImageNumberDisplayABLRManderMode
 local ImageNumberDisplayABLR = MKWImageValueDisplay.ImageNumberDisplayABLR
 local ImageNumberDisplayManderMode = MKWImageValueDisplay.ImageNumberDisplayManderMode
 
@@ -43,10 +40,9 @@ function layouts.velocityAndRaceInfo:init(noShake)
   -- position difference between consecutive frames. So we use breakpoint-based
   -- updates in order to not miss any frames.
   self:setBreakpointUpdateMethod()
-  self:activateAutoPositioningY()
 self.window:setSize(400, 500)
   self.window:setColor(0x000000)
-  self.labelDefaults = {fontSize="10", fontName="Px437 TandyNew TV"}
+  self.labelDefaults = {fontSize=10, fontName="Px437 TandyNew TV"}
   self.itemDisplayDefaults = {narrow=true}
     self.window:setCaption("MKW Race Info")
 
@@ -56,20 +52,22 @@ self.window:setSize(400, 500)
   self:addItem(game:V(game.Velocity, "XYZ"))
   self:addItem(game.pos)
 
-  self:addLabel{fontColor=inputColor}
+  self:addLabel{fontColor=inputColor, y=100}
 self:addItem(game.airtime)
 self:addItem(game.mtcharge)
 self:addItem(game.checkpoint)
 self:addItem(game.keycheckpoint)
 self:addItem(game.lapcompleted)
-self:addItem(game.mtboost)
-self:addItem(game.mushroomboost)
-self:addItem(game.trickboost)
+self:addItem(game.BoostType)
+  self:addLabel{fontColor=inputColor, x=12, y=180}
+self:addItem(game.horizontalbyte)
+  self:addLabel{fontColor=inputColor, x=48, y=180}
+self:addItem(game.verticalbyte)
+  self:addLabel{fontColor=inputColor, x=84, y=180}
 self:addItem(game.ABLRInput)
-self:addItem(game.vertical)
-self:addItem(game.horizontal)
+  self:addLabel{fontColor=inputColor, x=120, y=180}
 self:addItem(game.DPAD)
-  self:addLabel{fontColor=inputColor}
+  self:addLabel{fontColor=inputColor, y=300}
   self:addItem(game.stageTime)
 end
 
@@ -108,9 +106,10 @@ self.window:setSize(400, 500)
 
 
  self:addLabel()
-self:addImage(ImageValueDisplay, {game.vehiclespeed, 10, {beforeDecimal=2, afterDecimal=0, leftPaddingMethod='space'}}, {x=40, y=360})
-self:addImage(ImageValueDisplay, {game.airtime, 10, {beforeDecimal=4, afterDecimal=0, leftPaddingMethod='space'}}, {x=-10, y=120})
-self:addImage(ImageValueDisplay, {game.mtcharge, 10, {trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'}}, {x=-10, y=180})
+self:addImage(ImageValueDisplay, {game.vehiclespeed, 10, {beforeDecimal=2, afterDecimal=0, leftPaddingMethod='space'}}, {x=140, y=360})
+self:addImage(ImageValueDisplay, {game.airtime, 10, {beforeDecimal=4, afterDecimal=0, leftPaddingMethod='space'}}, {x=90, y=120})
+self:addImage(ImageValueDisplay, {game.mttype, 10, {trimTrailingZeros=true, beforeDecimal=4, leftPaddingMethod='space'}}, {x=90, y=180})
+self:addImage(ImageValueDisplay, {game.Boost, 10, {trimTrailingZeros=true, beforeDecimal=3, leftPaddingMethod='space'}}, {x=140, y=240})
 end
 
 layouts.Inputs = subclass(Layout)
@@ -151,16 +150,18 @@ self.window:setSize(429, 150)
   self:addLabel()
   self:addImage(ImageNumberDisplayManderMode, {game.kmh})
   --speed + MT Charge
-  self:addLabel{fontColor=inputColor, x=-54, y=6}
+  self:addLabel{fontColor=inputColor, x=-54, y=42}
   self:addItem(game.mt)
-  self:addLabel{fontColor=inputColor, x=-18, y=-28}
+  self:addLabel{fontColor=inputColor, x=-18, y=8}
   self:addItem(game.speed, {beforeDecimal=2, afterDecimal=0, leftPaddingMethod='space'})
   --Inputs
-  self:addLabel{fontColor=inputColor,x=111, y=40}
-  self:addImage(ImageNumberDisplayABLRManderMode, {game.ABLRInput}, {x=215, y=75})
-  self:addImage(ImageNumberDisplayverticalManderMode, {game.verticalbyte}, {x=111, y=75})
-  self:addImage(ImageNumberDisplayhorizontalManderMode, {game.horizontalbyte}, {x=17, y=75})
-  self:addLabel{fontColor=inputColor,x=350, y=41}
+  self:addLabel{fontColor=inputColor,x=232, y=76}
+  self:addItem(game.ABLRInput)
+  self:addLabel{fontColor=inputColor,x=124, y=76}
+  self:addItem(game.verticalbyte)
+  self:addLabel{fontColor=inputColor,x=18, y=76}
+  self:addItem(game.horizontalbyte)
+  self:addLabel{fontColor=inputColor,x=350, y=76}
   self:addItem(game.DPADmandermode)
 end
 
